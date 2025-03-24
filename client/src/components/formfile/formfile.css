@@ -1,0 +1,300 @@
+/* ===== FORM STYLING ===== */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap');
+
+/* Main form container */
+.email-form-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 3rem;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+  width: 80%;
+  max-height: 85vh;
+  overflow-y: auto;
+  /* Hide scrollbar but maintain scrollability */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.email-form-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Form title */
+.email-form-container h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #2c3e50;
+}
+
+/* Form prompts */
+.form-prompt {
+  font-family: 'Caveat', cursive;
+  font-size: 1.8rem;
+  color: #386641;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+/* Form groups */
+.form-group {
+  margin-bottom: 25px;
+  max-width: 96.5%;
+}
+
+/* Form labels */
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #386641;
+}
+
+/* Form inputs and textareas */
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #a7c957;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: rgba(255, 255, 255, 0.9);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #6a994e;
+  box-shadow: 0 0 0 3px rgba(106, 153, 78, 0.2);
+}
+
+/* Allow vertical resizing for textarea */
+.form-group textarea {
+  resize: vertical;
+}
+
+/* Checkbox group */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  background-color: rgba(167, 201, 87, 0.1);
+  border-radius: 6px;
+  padding: 12px 15px;
+  border: 1px solid #a7c957;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.checkbox-group:hover {
+  background-color: rgba(167, 201, 87, 0.2);
+  box-shadow: 0 0 0 3px rgba(106, 153, 78, 0.1);
+}
+
+.checkbox-group input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #386641;
+  border-radius: 4px;
+  margin-right: 12px;
+  margin-top: 0;
+  cursor: pointer;
+  position: relative;
+  background-color: white;
+  flex-shrink: 0;
+}
+
+.checkbox-group input[type="checkbox"]:checked {
+  background-color: #386641;
+}
+
+.checkbox-group input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-group label {
+  margin-bottom: 0;
+  flex: 1;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #386641;
+  font-weight: 500;
+}
+
+/* Submit button */
+.submit-btn {
+  display: inline-block;
+  background-color: #386641;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  width: 100%;
+}
+
+.submit-btn:hover {
+  background-color: #2d5232;
+  transform: translateY(-2px);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+.submit-btn:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+/* Status messages */
+.status-message {
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.status-message.success {
+  background-color: rgba(106, 153, 78, 0.2);
+  color: #386641;
+  border: 1px solid #6a994e;
+}
+
+.status-message.error {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  border: 1px solid #dc3545;
+}
+
+/* Privacy notice */
+.privacy-notice {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  padding: 10px;
+  font-size: 0.8rem;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+/* For tablets */
+@media (max-width: 768px) {
+  .email-form-container {
+    padding: 25px 20px;
+  }
+  
+  .form-prompt {
+    font-size: 1.6rem;
+  }
+}
+
+/* For mobile phones */
+@media (max-width: 480px) {
+  .form-prompt {
+    font-size: 1.4rem;
+  }
+  
+  .form-group input[type="text"],
+  .form-group input[type="email"],
+  .form-group textarea {
+    padding: 10px;
+  }
+  
+  .submit-btn {
+    padding: 12px;
+  }
+}
+
+/* For smaller screens */
+@media (max-height: 700px) {
+  .email-form-container {
+    padding: 15px;
+    max-height: 90vh;
+  }
+  
+  .email-form-container h2 {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+}
+
+/* For extra small screens */
+@media (max-height: 500px) {
+  .email-form-container {
+    max-height: 95vh;
+    padding: 10px;
+  }
+  
+  .email-form-container h2 {
+    font-size: 2rem;
+    margin-bottom: 5px;
+  }
+}
+
+/* ===== BUTTON STYLES ===== */
+/* Common styles for both primary and secondary buttons */
+.btn-primary, .btn-secondary {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+/* Primary button (green) */
+.btn-primary {
+  background-color: #33691e;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+/* Secondary button (light green) */
+.btn-secondary {
+  background-color: #a5d6a7;
+  color: #2e3b2f;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+/* Hover effect for primary button */
+.btn-primary:hover {
+  background-color: #1b5e20;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Hover effect for secondary button */
+.btn-secondary:hover {
+  background-color: #81c784;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+} 
