@@ -98,6 +98,7 @@
   border-radius: 6px;
   padding: 12px 15px;
   border: 1px solid #a7c957;
+  margin-bottom: 10px;
   transition: background-color 0.3s, box-shadow 0.3s;
 }
 
@@ -491,4 +492,21 @@
     margin-top: 5px;
     margin-bottom: 15px;
   }
+}
+
+/* Hide scrollbars but keep scrolling functionality */
+textarea, 
+.form-content, 
+.modal-dialog,
+.form-container {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Webkit (Chrome, Safari, newer Edge) */
+textarea::-webkit-scrollbar, 
+.form-content::-webkit-scrollbar, 
+.modal-dialog::-webkit-scrollbar,
+.form-container::-webkit-scrollbar {
+  display: none;
 } 

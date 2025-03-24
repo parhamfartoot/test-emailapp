@@ -196,51 +196,9 @@ const PromiseTree = () => {
     
     return (
       <div className="carousel-container">
-        {!isMobile && (
-          <button 
-            className="carousel-button prev-button" 
-            onClick={prevSlide} 
-            disabled={currentSlide === 0}
-            aria-label="Previous slide"
-          >
-            &lt;
-          </button>
-        )}
-        
-        <div className="carousel-content">
-          {getCurrentPromises().map((promise) => (
-            <div 
-              key={promise._id} 
-              className={`promise-card ${isMobile ? 'mobile-card' : ''}`}
-              onClick={() => handlePromiseClick(promise)}
-            >
-              <div className="card-header">
-                <h3>{promise.name || 'Anonymous'}</h3>
-                <small>{formatDate(promise.createdAt)}</small>
-              </div>
-              <div className="card-content">
-                <p>{promise.promise || 'No details available'}</p>
-              </div>
-              <div className="card-footer">
-                <span className="read-more">Read more</span>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {!isMobile && (
-          <button 
-            className="carousel-button next-button" 
-            onClick={nextSlide} 
-            disabled={currentSlide === totalSlides - 1}
-            aria-label="Next slide"
-          >
-            &gt;
-          </button>
-        )}
-        
-        {isMobile && (
-          <div className="mobile-carousel-controls">
+        {!isMobile ? (
+          // Desktop view with content wrapper
+          <div className="carousel-content-wrapper">
             <button 
               className="carousel-button prev-button" 
               onClick={prevSlide} 
@@ -249,6 +207,28 @@ const PromiseTree = () => {
             >
               &lt;
             </button>
+            
+            <div className="carousel-content">
+              {getCurrentPromises().map((promise) => (
+                <div 
+                  key={promise._id} 
+                  className="promise-card"
+                  onClick={() => handlePromiseClick(promise)}
+                >
+                  <div className="card-header">
+                    <h3>{promise.name || 'Anonymous'}</h3>
+                    <small>{formatDate(promise.createdAt)}</small>
+                  </div>
+                  <div className="card-content">
+                    <p>{promise.promise || 'No details available'}</p>
+                  </div>
+                  <div className="card-footer">
+                    <span className="read-more">Read more</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
             <button 
               className="carousel-button next-button" 
               onClick={nextSlide} 
@@ -258,18 +238,98 @@ const PromiseTree = () => {
               &gt;
             </button>
           </div>
+        ) : (
+          // Mobile view remains unchanged
+          <>
+            <div className="carousel-content">
+              {getCurrentPromises().map((promise) => (
+                <div 
+                  key={promise._id} 
+                  className="promise-card mobile-card"
+                  onClick={() => handlePromiseClick(promise)}
+                >
+                  <div className="card-header">
+                    <h3>{promise.name || 'Anonymous'}</h3>
+                    <small>{formatDate(promise.createdAt)}</small>
+                  </div>
+                  <div className="card-content">
+                    <p>{promise.promise || 'No details available'}</p>
+                  </div>
+                  <div className="card-footer">
+                    <span className="read-more">Read more</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mobile-carousel-controls">
+              <button 
+                className="carousel-button prev-button" 
+                onClick={prevSlide} 
+                disabled={currentSlide === 0}
+                aria-label="Previous slide"
+              >
+                &lt;
+              </button>
+              <button 
+                className="carousel-button next-button" 
+                onClick={nextSlide} 
+                disabled={currentSlide === totalSlides - 1}
+                aria-label="Next slide"
+              >
+                &gt;
+              </button>
+            </div>
+          </>
         )}
         
-        <div className="carousel-indicators">
-          {Array.from({ length: totalSlides }).map((_, index) => (
-            <div
-              key={index}
-              className={`carousel-indicator ${index === currentSlide ? 'active' : ''}`}
-              onClick={() => setCurrentSlide(index)}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
+        {renderCarouselIndicators()}
+      </div>
+    );
+  };
+
+  // Render the carousel indicators
+  const renderCarouselIndicators = () => {
+    const isMobile = windowWidth <= 576;
+    
+    if (isMobile) {
+      // For mobile devices, just show 3 dots (previous, current, next)
+      return (
+        <div className="carousel-indicators mobile-indicators">
+          {/* Previous slide indicator */}
+          <div
+            className={`carousel-indicator ${currentSlide > 0 ? 'available' : 'disabled'}`}
+            onClick={() => currentSlide > 0 && setCurrentSlide(currentSlide - 1)}
+            aria-label="Previous slide"
+          />
+          
+          {/* Current slide indicator */}
+          <div
+            className="carousel-indicator active"
+            aria-label={`Current slide ${currentSlide + 1} of ${totalSlides}`}
+          />
+          
+          {/* Next slide indicator */}
+          <div
+            className={`carousel-indicator ${currentSlide < totalSlides - 1 ? 'available' : 'disabled'}`}
+            onClick={() => currentSlide < totalSlides - 1 && setCurrentSlide(currentSlide + 1)}
+            aria-label="Next slide"
+          />
         </div>
+      );
+    }
+    
+    // For desktop, show all indicators (one per slide)
+    return (
+      <div className="carousel-indicators">
+        {Array.from({ length: totalSlides }).map((_, index) => (
+          <div
+            key={index}
+            className={`carousel-indicator ${index === currentSlide ? 'active' : ''}`}
+            onClick={() => setCurrentSlide(index)}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
       </div>
     );
   };
