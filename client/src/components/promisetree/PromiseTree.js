@@ -299,7 +299,7 @@ const PromiseTree = () => {
     
     // For desktop, show all indicators (one per slide)
     return (
-      <div className="carousel-indicators">
+      <div className="carousel-indicators desktop-hidden">
         {Array.from({ length: totalSlides }).map((_, index) => (
           <div
             key={index}
