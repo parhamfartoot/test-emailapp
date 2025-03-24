@@ -1,0 +1,124 @@
+/* Mobile-first optimizations shared across components */
+
+/* Base mobile optimizations */
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+  
+  /* Optimize touch targets */
+  button, 
+  a, 
+  input[type="checkbox"] + label, 
+  input[type="radio"] + label,
+  .btn-primary, 
+  .btn-secondary,
+  .scroll-indicator {
+    min-height: 44px;
+    min-width: 44px;
+    /* Ensure proper touch target size for all interactive elements */
+  }
+  
+  /* Improve scrolling */
+  .scroll-container {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Better form inputs for mobile */
+  input, textarea, select {
+    font-size: 16px !important; /* Prevents iOS zoom when focusing */
+  }
+}
+
+/* Video background optimization */
+.video-background, 
+.background-video {
+  pointer-events: none !important;
+  touch-action: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  
+  /* Optional: Add low power mode for mobile */
+  @media (max-width: 768px) {
+    &.low-power {
+      display: none;
+    }
+  }
+}
+
+/* Static background fallback for low-power mode */
+.static-background {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  
+  @media (max-width: 768px) {
+    .low-power & {
+      display: block;
+    }
+  }
+}
+
+/* Mobile loading indicator */
+.mobile-loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  font-size: 16px;
+  color: #33691e;
+}
+
+/* Active states for mobile touch */
+@media (max-width: 768px) {
+  .btn-primary:active,
+  .btn-secondary:active,
+  button:active,
+  a:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+/* Device-specific fixes */
+/* iPhone X, 11, 12, 13 series */
+@media only screen 
+  and (device-width: 375px) 
+  and (device-height: 812px),
+  only screen 
+  and (device-width: 390px) 
+  and (device-height: 844px),
+  only screen 
+  and (device-width: 414px) 
+  and (device-height: 896px),
+  only screen 
+  and (device-width: 428px) 
+  and (device-height: 926px) {
+    
+  /* Fix for iPhone notch */
+  .app-header, .home-container, .promise-tree-container, .email-form-container {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  /* Prevent overscrolling */
+  .mobile-scroll-container {
+    height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+} 

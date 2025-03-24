@@ -1,24 +1,31 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import './homepage.css';
+import '../mobile-optimizations.css';
 import backgroundVideo from '../../assets/Sun_Bright_Nature_Park_Walking_uhd_1907853.mp4';
+// We'll assume we have a static image in the assets folder with the same name
+import staticBackground from '../../assets/Sun_Bright_Nature_Park_Walking_static.jpg';
 
 function AppHome() {
   const [showScrollDown, setShowScrollDown] = useState(false);
   const [showScrollUp, setShowScrollUp] = useState(false);
+  const [isLowPowerMode, setIsLowPowerMode] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isLoading, setIsLoading] = useState(true);
   const contentRef = useRef(null);
   const containerRef = useRef(null);
+  const videoRef = useRef(null);
 
   // Function to handle scrolling when arrows are clicked
-  const handleScroll = (direction) => {
+  const handleScroll = useCallback((direction) => {
     if (contentRef.current) {
       const scrollAmount = direction === 'down' ? 300 : -300;
       contentRef.current.scrollBy({ top: scrollAmount, behavior: 'smooth' });
     }
-  };
+  }, []);
 
   // Function to check scroll position and update arrow visibility
-  const checkScrollPosition = () => {
+  const checkScrollPosition = useCallback(() => {
     if (!contentRef.current) return;
     
     const { scrollTop, scrollHeight, clientHeight } = contentRef.current;
@@ -30,7 +37,49 @@ function AppHome() {
     
     // Show up arrow as soon as we scroll a little
     setShowScrollUp(scrollTop > 5);
-  };
+  }, []);
+
+  // Function to check device capability/connection speed
+  const checkDeviceCapability = useCallback(() => {
+    // Check if battery API is available
+    if ('getBattery' in navigator) {
+      navigator.getBattery().then(batteryManager => {
+        // If battery level is below 15% or in power saving mode, switch to static image
+        if (batteryManager.level < 0.15 || batteryManager.charging === false) {
+          setIsLowPowerMode(true);
+        }
+      }).catch(() => {
+        // If can't access battery API, use connection check
+        checkConnectionSpeed();
+      });
+    } else {
+      // Fallback to connection check
+      checkConnectionSpeed();
+    }
+  }, []);
+
+  // Check connection speed
+  const checkConnectionSpeed = useCallback(() => {
+    // Use Network Information API if available
+    if ('connection' in navigator) {
+      const connection = navigator.connection;
+      if (connection.saveData || 
+          connection.effectiveType === 'slow-2g' || 
+          connection.effectiveType === '2g') {
+        setIsLowPowerMode(true);
+      }
+    }
+  }, []);
+
+  // Function to handle window resize
+  const handleResize = useCallback(() => {
+    setIsMobile(window.innerWidth <= 768);
+  }, []);
+
+  // Function to handle video loaded
+  const handleVideoLoaded = useCallback(() => {
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
     const content = contentRef.current;
@@ -41,31 +90,56 @@ function AppHome() {
       // Add scroll event listener
       content.addEventListener('scroll', checkScrollPosition);
       
-      // Clean up event listener on unmount
+      // Check device capabilities for video playback
+      checkDeviceCapability();
+      
+      // Add resize listener
+      window.addEventListener('resize', handleResize);
+      
+      // Clean up event listeners on unmount
       return () => {
         content.removeEventListener('scroll', checkScrollPosition);
+        window.removeEventListener('resize', handleResize);
       };
     }
-  }, []);
+  }, [checkScrollPosition, checkDeviceCapability, handleResize]);
 
   return (
     <div className="home-container earth-theme" ref={containerRef}>
+      {isLoading && isMobile && (
+        <div className="mobile-loading">
+          <p>Loading green experience...</p>
+        </div>
+      )}
+      
       <video 
+        ref={videoRef}
         autoPlay 
         muted 
         loop 
-        className="video-background" 
+        className={`video-background ${isLowPowerMode ? 'low-power' : ''}`}
         playsInline 
         disablePictureInPicture 
         controlsList="nodownload nofullscreen noremoteplayback" 
         style={{ pointerEvents: 'none' }}
+        onCanPlay={handleVideoLoaded}
       >
         <source src={backgroundVideo} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
+      
+      {/* Static image fallback for low power mode */}
+      {isLowPowerMode && (
+        <img 
+          src={staticBackground} 
+          alt="Nature background" 
+          className="static-background" 
+        />
+      )}
+      
       <div className="video-overlay"></div>
       
-      <div className="home-content" ref={contentRef}>
+      <div className="home-content mobile-scroll-container" ref={contentRef}>
         <h1 className="handwritten-title">A Promise to the Earth</h1>
         <p className="subtitle">The First Supper - A Digital Time Capsule</p>
         

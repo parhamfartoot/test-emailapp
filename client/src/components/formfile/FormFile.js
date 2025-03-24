@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './formfile.css';
+import '../mobile-optimizations.css';
 import backgroundVideo from '../../assets/Sun_Bright_Nature_Park_Walking_uhd_1907853.mp4';
 import { API_BASE_URL } from '../../config';
 
@@ -9,8 +10,12 @@ const EmailForm = () => {
   const navigate = useNavigate();
   const contentRef = useRef(null);
   const containerRef = useRef(null);
+  const videoRef = useRef(null);
   const [showScrollDown, setShowScrollDown] = useState(false);
   const [showScrollUp, setShowScrollUp] = useState(false);
+  const [isLowPowerMode, setIsLowPowerMode] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [formLoading, setFormLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -23,17 +28,19 @@ const EmailForm = () => {
     type: ''
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   // Function to handle scrolling when arrows are clicked
-  const handleScroll = (direction) => {
+  const handleScroll = useCallback((direction) => {
     if (contentRef.current) {
       const scrollAmount = direction === 'down' ? 300 : -300;
       contentRef.current.scrollBy({ top: scrollAmount, behavior: 'smooth' });
     }
-  };
+  }, []);
 
   // Function to check scroll position and update arrow visibility
-  const checkScrollPosition = () => {
+  const checkScrollPosition = useCallback(() => {
     if (!contentRef.current) return;
     
     const { scrollTop, scrollHeight, clientHeight } = contentRef.current;
@@ -45,6 +52,69 @@ const EmailForm = () => {
     
     // Show up arrow as soon as we scroll a little
     setShowScrollUp(scrollTop > 5);
+  }, []);
+
+  // Function to check device capability
+  const checkDeviceCapability = useCallback(() => {
+    if ('getBattery' in navigator) {
+      navigator.getBattery().then(batteryManager => {
+        if (batteryManager.level < 0.15 || batteryManager.charging === false) {
+          setIsLowPowerMode(true);
+        }
+      }).catch(() => {
+        checkConnectionSpeed();
+      });
+    } else {
+      checkConnectionSpeed();
+    }
+  }, []);
+
+  // Check connection speed
+  const checkConnectionSpeed = useCallback(() => {
+    if ('connection' in navigator) {
+      const connection = navigator.connection;
+      if (connection.saveData || 
+          connection.effectiveType === 'slow-2g' || 
+          connection.effectiveType === '2g') {
+        setIsLowPowerMode(true);
+      }
+    }
+  }, []);
+
+  // Handle window resize
+  const handleResize = useCallback(() => {
+    setIsMobile(window.innerWidth <= 768);
+  }, []);
+
+  // Validate form
+  const validateForm = useCallback(() => {
+    const errors = {};
+    if (!formData.name.trim()) {
+      errors.name = 'Name is required';
+    }
+    
+    if (!formData.promise.trim()) {
+      errors.promise = 'Promise is required';
+    } else if (formData.promise.length < 10) {
+      errors.promise = 'Promise should be at least 10 characters';
+    }
+    
+    if (formData.email.trim() && !validateEmail(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+    
+    if (formData.email.trim() && !formData.consent) {
+      errors.consent = 'You must consent to receive a reminder for your pledge';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  }, [formData]);
+  
+  // Email validation
+  const validateEmail = (email) => {
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
   };
 
   useEffect(() => {
@@ -56,92 +126,132 @@ const EmailForm = () => {
       // Add scroll event listener
       content.addEventListener('scroll', checkScrollPosition);
       
-      // Clean up event listener on unmount
+      // Add resize listener
+      window.addEventListener('resize', handleResize);
+      
+      // Clean up event listeners on unmount
       return () => {
         content.removeEventListener('scroll', checkScrollPosition);
+        window.removeEventListener('resize', handleResize);
       };
     }
-  }, []);
+  }, [checkScrollPosition, handleResize]);
+  
+  useEffect(() => {
+    // Check device capabilities for video playback
+    checkDeviceCapability();
+  }, [checkDeviceCapability]);
 
   const handleChange = (e) => {
-    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-    setFormData({
-      ...formData,
-      [e.target.name]: value,
-    });
+    const { name, value, type, checked } = e.target;
+    const val = type === 'checkbox' ? checked : value;
+    setFormData({ ...formData, [name]: val });
+    
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors({
+        ...formErrors,
+        [name]: ''
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.promise) {
-      setStatus({
-        message: 'Please fill in all required fields',
-        type: 'error'
-      });
+    // Validate form before submission
+    if (!validateForm()) {
+      // Scroll to the first error if on mobile
+      if (isMobile) {
+        const firstErrorField = document.querySelector('.input-error');
+        if (firstErrorField) {
+          firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
       return;
     }
     
     setIsLoading(true);
-    setStatus({ message: '', type: '' });
-    
-    // Prepare data for the API
-    const pledgeData = {
-      name: formData.name,
-      email: formData.email,
-      promise: formData.promise,
-      reminderConsent: formData.consent
-    };
+    setFormLoading(true);
     
     try {
-      // Use the correct API endpoint
-      const response = await axios.post(
-        `${API_BASE_URL}/api/pledges`, 
-        pledgeData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      // Only include email and consent if email is provided
+      const submissionData = {
+        name: formData.name,
+        promise: formData.promise
+      };
+      
+      if (formData.email.trim()) {
+        submissionData.email = formData.email;
+        submissionData.reminderConsent = formData.consent;
+      }
+      
+      const response = await axios.post(`${API_BASE_URL}/api/submit-pledge`, submissionData);
       
       if (response.data.success) {
         setStatus({
-          message: 'Your promise has been recorded and added to our Digital Time Capsule!',
+          message: 'Your promise has been recorded. Thank you for your commitment!',
           type: 'success'
         });
-        setFormData({ name: '', email: '', promise: '', consent: false });
+        setIsSubmitted(true);
         
-        // Navigate to promise tree after successful submission
+        // Clear form after successful submission
+        setFormData({
+          name: '',
+          email: '',
+          promise: '',
+          consent: false
+        });
+        
+        // Redirect to promise tree after short delay
         setTimeout(() => {
           navigate('/promise-tree');
-        }, 1500);
+        }, 3000);
       } else {
-        throw new Error(response.data.message || 'Failed to send promise');
+        throw new Error(response.data.message || 'Failed to submit pledge');
       }
-    } catch (error) {
+    } catch (err) {
       setStatus({
-        message: 'Failed to send promise. Please try again later.',
+        message: err.response?.data?.message || err.message || 'An error occurred. Please try again.',
         type: 'error'
       });
     } finally {
       setIsLoading(false);
+      setFormLoading(false);
     }
   };
 
   return (
-    <div className="home-container earth-theme" ref={containerRef}>
-      <video autoPlay muted loop className="video-background">
+    <div className="email-form-container earth-theme" ref={containerRef}>
+      {formLoading && isMobile && (
+        <div className="mobile-loading">
+          <p>Sending your promise...</p>
+        </div>
+      )}
+      
+      <video 
+        ref={videoRef}
+        autoPlay 
+        muted 
+        loop 
+        className={`video-background ${isLowPowerMode ? 'low-power' : ''}`}
+        playsInline 
+        disablePictureInPicture 
+        controlsList="nodownload nofullscreen noremoteplayback" 
+        style={{ pointerEvents: 'none' }}
+      >
         <source src={backgroundVideo} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
+      
       <div className="video-overlay"></div>
       
-      <div className="email-form-container" ref={contentRef}>
-        <h2 className="handwritten-title">Make Your Promise to the Earth</h2>
-        <p className="form-prompt">
-          What small action can you take today to transform the food system?
-        </p>
+      <div className="form-content mobile-scroll-container" ref={contentRef}>
+        <h2 className="handwritten-title">Make Your Promise</h2>
+        
+        <div className="form-prompt">
+          What is your promise to the Earth?
+        </div>
         
         {status.message && (
           <div className={`status-message ${status.type}`}>
@@ -149,65 +259,75 @@ const EmailForm = () => {
           </div>
         )}
         
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="name">Your Name</label>
+        <form onSubmit={handleSubmit} className="promise-form" noValidate>
+          <div className={`form-group ${formErrors.name ? 'input-error' : ''}`}>
+            <label htmlFor="name">Your Name *</label>
             <input
               type="text"
               id="name"
               name="name"
-              placeholder="Your full name"
               value={formData.name}
               onChange={handleChange}
               required
+              aria-required="true"
+              disabled={isLoading}
+              autoComplete="name"
             />
+            {formErrors.name && <div className="error-message">{formErrors.name}</div>}
           </div>
           
-          <div className="form-group">
-            <label htmlFor="email">Email Address</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="Your email address"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="promise">Your Promise for 2050</label>
+          <div className={`form-group ${formErrors.promise ? 'input-error' : ''}`}>
+            <label htmlFor="promise">Your Promise to the Earth *</label>
             <textarea
               id="promise"
               name="promise"
-              placeholder="I promise to..."
               value={formData.promise}
               onChange={handleChange}
               rows="4"
               required
-            />
+              aria-required="true"
+              disabled={isLoading}
+              placeholder="I promise to..."
+            ></textarea>
+            {formErrors.promise && <div className="error-message">{formErrors.promise}</div>}
           </div>
           
-          <div className="form-group checkbox-group">
+          <div className={`form-group ${formErrors.email ? 'input-error' : ''}`}>
+            <label htmlFor="email">Email Address (Optional)</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              disabled={isLoading}
+              autoComplete="email"
+            />
+            {formErrors.email && <div className="error-message">{formErrors.email}</div>}
+          </div>
+          
+          <div className={`checkbox-group ${formErrors.consent ? 'input-error' : ''}`}>
             <input
               type="checkbox"
               id="consent"
               name="consent"
               checked={formData.consent}
               onChange={handleChange}
+              disabled={isLoading}
             />
             <label htmlFor="consent">
               I wish to be reminded of my promise in 2029
             </label>
+            {formErrors.consent && <div className="error-message">{formErrors.consent}</div>}
           </div>
           
           <button 
             type="submit" 
+            className="submit-btn" 
             disabled={isLoading}
-            className="submit-btn"
+            aria-busy={isLoading}
           >
-            {isLoading ? 'Recording Your Promise...' : 'Submit Your Promise'}
+            {isLoading ? 'Submitting...' : 'Submit Your Promise'}
           </button>
         </form>
         
