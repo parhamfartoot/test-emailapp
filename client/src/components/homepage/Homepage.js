@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import './homepage.css';
 import '../mobile-optimizations.css';
 import backgroundVideo from '../../assets/Sun_Bright_Nature_Park_Walking_uhd_1907853.mp4';
-// We'll assume we have a static image in the assets folder with the same name
+// Use the static image that exists in the assets folder
 import staticBackground from '../../assets/Sun_Bright_Nature_Park_Walking_static.jpg';
 
 function AppHome() {
