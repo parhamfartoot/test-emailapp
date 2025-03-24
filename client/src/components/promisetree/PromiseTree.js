@@ -292,31 +292,9 @@ const PromiseTree = () => {
   const renderCarouselIndicators = () => {
     const isMobile = windowWidth <= 576;
     
+    // Skip rendering indicators on mobile
     if (isMobile) {
-      // For mobile devices, just show 3 dots (previous, current, next)
-      return (
-        <div className="carousel-indicators mobile-indicators">
-          {/* Previous slide indicator */}
-          <div
-            className={`carousel-indicator ${currentSlide > 0 ? 'available' : 'disabled'}`}
-            onClick={() => currentSlide > 0 && setCurrentSlide(currentSlide - 1)}
-            aria-label="Previous slide"
-          />
-          
-          {/* Current slide indicator */}
-          <div
-            className="carousel-indicator active"
-            aria-label={`Current slide ${currentSlide + 1} of ${totalSlides}`}
-          />
-          
-          {/* Next slide indicator */}
-          <div
-            className={`carousel-indicator ${currentSlide < totalSlides - 1 ? 'available' : 'disabled'}`}
-            onClick={() => currentSlide < totalSlides - 1 && setCurrentSlide(currentSlide + 1)}
-            aria-label="Next slide"
-          />
-        </div>
-      );
+      return null;
     }
     
     // For desktop, show all indicators (one per slide)

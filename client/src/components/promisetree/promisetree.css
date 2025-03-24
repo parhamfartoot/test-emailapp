@@ -377,16 +377,6 @@
     font-size: 18px;
   }
   
-  /* Indicators */
-  .carousel-indicators {
-    margin-top: 15px;
-  }
-  
-  .carousel-indicator {
-    width: 8px;
-    height: 8px;
-  }
-  
   /* Empty state */
   .no-promises {
     padding: 20px;
@@ -417,11 +407,6 @@
   .close-button {
     min-width: 44px;
     min-height: 44px;
-  }
-  
-  /* Add more space between carousel indicators for easier tapping */
-  .carousel-indicators {
-    gap: 12px;
   }
   
   /* Ensure promise cards have enough space to tap */
@@ -915,52 +900,5 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-}
-
-/* Mobile indicators - simplified to 3 dots */
-.mobile-indicators {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  gap: 18px;
-  margin-top: 25px;
-  margin-bottom: 15px;
-}
-
-.mobile-indicators .carousel-indicator {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background-color: rgba(76, 175, 80, 0.3);
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.mobile-indicators .carousel-indicator.active {
-  background-color: #4CAF50;
-  transform: scale(1.4);
-  width: 14px;
-  height: 14px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-
-.mobile-indicators .carousel-indicator.available {
-  background-color: rgba(76, 175, 80, 0.6);
-  cursor: pointer;
-}
-
-.mobile-indicators .carousel-indicator.disabled {
-  background-color: rgba(76, 175, 80, 0.15);
-  cursor: default;
-}
-
-@media (max-width: 576px) {
-  .mobile-indicators {
-    gap: 12px;
-  }
-  
-  .carousel-indicators:not(.mobile-indicators) {
-    display: none;
   }
 } 
