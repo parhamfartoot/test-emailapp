@@ -8,12 +8,22 @@ const router = express.Router();
 router.post('/login', (req, res) => {
   const { username, password } = req.body;
   
-  // Simple authentication logic
-  // In a production environment, use proper authentication with hashed passwords
-  if (username === 'adminEarthPromise2025' && password === 'yourpassword') {
+  // Use environment variables for authentication
+  const adminUsername = process.env.ADMIN_USERNAME;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  
+  if (username === adminUsername && password === adminPassword) {
+    // Generate JWT token using the secret key
+    const jwt = require('jsonwebtoken');
+    const token = jwt.sign(
+      { username: adminUsername, role: 'admin' },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+    
     res.json({ 
       success: true, 
-      token: 'sample-token',
+      token: token,
       message: 'Login successful' 
     });
   } else {
