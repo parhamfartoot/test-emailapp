@@ -8,7 +8,7 @@ const app = express();
 // CORS configuration
 app.use(cors({
   origin: [
-    'https://email-app-client.onrender.com',
+    'https://promisetotheearth.onrender.com',
     'http://localhost:3000' // For local development
   ],
   credentials: true
