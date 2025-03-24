@@ -25,7 +25,8 @@ const PromiseTree = () => {
       
       // Fetch pledges from the database with correct server URL
       const response = await axios.get(`${API_BASE_URL}/api/pledges`);
-      const pledges = response.data;
+      // Extract the data from the response.data.data (the server returns { success: true, data: [...] })
+      const pledges = response.data.data || [];
       
       // Map the pledges to a consistent format in case API returns different field names
       const formattedPledges = pledges.map(pledge => ({
