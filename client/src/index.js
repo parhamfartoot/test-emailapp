@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import './index.css'; // Import global CSS first
 import AppHome from './components/homepage/Homepage';
 import EmailForm from './components/formfile/FormFile';
 import PromiseTree from './components/promisetree/PromiseTree';

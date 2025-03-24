@@ -16,8 +16,27 @@ const PromiseTree = () => {
   
   // Carousel state
   const [currentSlide, setCurrentSlide] = useState(0);
-  const itemsPerSlide = 3; // Number of promises to show per slide
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
+  // Responsive carousel settings
+  const getItemsPerSlide = () => {
+    if (windowWidth <= 576) return 1;
+    if (windowWidth <= 992) return 2;
+    return 3;
+  };
+
+  // Update window width on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      // Reset to first slide when resizing to avoid empty slides
+      setCurrentSlide(0);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Load promises data from the API
   const fetchPromises = async () => {
     try {
@@ -86,6 +105,7 @@ const PromiseTree = () => {
   }, [searchQuery, promises]);
   
   // Calculate total number of slides
+  const itemsPerSlide = getItemsPerSlide();
   const totalSlides = Math.ceil(filteredPromises.length / itemsPerSlide);
   
   // Navigate to previous slide
@@ -127,6 +147,8 @@ const PromiseTree = () => {
 
   // Render the carousel content
   const renderCarousel = () => {
+    const isMobile = windowWidth <= 576;
+    
     // Check if there are no promises at all
     if (promises.length === 0) {
       return (
@@ -151,65 +173,83 @@ const PromiseTree = () => {
       );
     }
     
-    // Get the current promises to display
-    const currentPromises = getCurrentPromises();
-    
     return (
-      <>
-        <div className="carousel-container">
+      <div className="carousel-container">
+        {!isMobile && (
           <button 
             className="carousel-button prev-button" 
-            onClick={prevSlide}
-            disabled={totalSlides <= 1}
+            onClick={prevSlide} 
+            disabled={currentSlide === 0}
             aria-label="Previous slide"
           >
-            &laquo;
+            &lt;
           </button>
-          
-          <div className="carousel-content">
-            {currentPromises.map(promise => (
-              <div 
-                key={promise._id} 
-                className="promise-card" 
-                onClick={() => handlePromiseClick(promise)}
-              >
-                <div className="card-header">
-                  <h3>{promise.name || 'Anonymous'}</h3>
-                  <small>{formatDate(promise.createdAt)}</small>
-                </div>
-                <div className="card-content">
-                  <p>{promise.promise || 'No details available'}</p>
-                </div>
-                <div className="card-footer">
-                  <span className="read-more">Read more</span>
-                </div>
+        )}
+        
+        <div className="carousel-content">
+          {getCurrentPromises().map((promise) => (
+            <div 
+              key={promise._id} 
+              className={`promise-card ${isMobile ? 'mobile-card' : ''}`}
+              onClick={() => handlePromiseClick(promise)}
+            >
+              <div className="card-header">
+                <h3>{promise.name || 'Anonymous'}</h3>
+                <small>{formatDate(promise.createdAt)}</small>
               </div>
-            ))}
-          </div>
-          
-          <button 
-            className="carousel-button next-button" 
-            onClick={nextSlide}
-            disabled={totalSlides <= 1}
-            aria-label="Next slide"
-          >
-            &raquo;
-          </button>
+              <div className="card-content">
+                <p>{promise.promise || 'No details available'}</p>
+              </div>
+              <div className="card-footer">
+                <span className="read-more">Read more</span>
+              </div>
+            </div>
+          ))}
         </div>
         
-        {totalSlides > 1 && (
-          <div className="carousel-indicators">
-            {Array.from({ length: totalSlides }).map((_, index) => (
-              <button
-                key={index}
-                className={`carousel-indicator ${currentSlide === index ? 'active' : ''}`}
-                onClick={() => setCurrentSlide(index)}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
+        {!isMobile && (
+          <button 
+            className="carousel-button next-button" 
+            onClick={nextSlide} 
+            disabled={currentSlide === totalSlides - 1}
+            aria-label="Next slide"
+          >
+            &gt;
+          </button>
+        )}
+        
+        {isMobile && (
+          <div className="mobile-carousel-controls">
+            <button 
+              className="carousel-button prev-button" 
+              onClick={prevSlide} 
+              disabled={currentSlide === 0}
+              aria-label="Previous slide"
+            >
+              &lt;
+            </button>
+            <button 
+              className="carousel-button next-button" 
+              onClick={nextSlide} 
+              disabled={currentSlide === totalSlides - 1}
+              aria-label="Next slide"
+            >
+              &gt;
+            </button>
           </div>
         )}
-      </>
+        
+        <div className="carousel-indicators">
+          {Array.from({ length: totalSlides }).map((_, index) => (
+            <div
+              key={index}
+              className={`carousel-indicator ${index === currentSlide ? 'active' : ''}`}
+              onClick={() => setCurrentSlide(index)}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      </div>
     );
   };
 
@@ -230,37 +270,37 @@ const PromiseTree = () => {
       </video>
       
       <div className="content-overlay">
-        <div className="main-content">
+        <div className="main-content mobile-scroll-container">
           <h1 className="page-title">Promises for the Earth</h1>
-        <p className="page-description">
+          <p className="page-description">
             Each promise represents a commitment to create a more sustainable food future.
             Browse through the carousel or search for specific promises.
-        </p>
+          </p>
         
-        <div className="search-container">
-          <input
-            type="text"
-            placeholder="Search promises..."
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="Search promises..."
               value={searchQuery}
-            onChange={handleSearchChange}
-            className="search-input"
-          />
-        </div>
+              onChange={handleSearchChange}
+              className="search-input"
+            />
+          </div>
         
-        {loading ? (
-          <div className="loading-container">
-            <div className="spinner"></div>
+          {loading ? (
+            <div className="loading-container">
+              <div className="spinner"></div>
               <p>Loading promises...</p>
-          </div>
-        ) : error ? (
-          <div className="error-container">
-            <p>{error}</p>
-          </div>
-        ) : (
-          <div className="carousel-section">
-            {renderCarousel()}
-          </div>
-        )}
+            </div>
+          ) : error ? (
+            <div className="error-container">
+              <p>{error}</p>
+            </div>
+          ) : (
+            <div className="carousel-section">
+              {renderCarousel()}
+            </div>
+          )}
         </div>
       </div>
       

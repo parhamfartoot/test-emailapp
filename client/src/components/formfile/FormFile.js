@@ -186,7 +186,7 @@ const EmailForm = () => {
         submissionData.reminderConsent = formData.consent;
       }
       
-      const response = await axios.post(`${API_BASE_URL}/api/submit-pledge`, submissionData);
+      const response = await axios.post(`${API_BASE_URL}/api/pledges`, submissionData);
       
       if (response.data.success) {
         setStatus({
