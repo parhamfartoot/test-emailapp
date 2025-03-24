@@ -257,12 +257,36 @@ const PromiseTree = () => {
       
       {/* Modal for displaying promise details */}
       {selectedPromise && (
-        <div className="promise-details-overlay" onClick={closePromiseDetails}>
-          <div className="promise-details-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="close-button" onClick={closePromiseDetails}>×</button>
-            <h2 className="modal-title">{selectedPromise.name || 'Anonymous'}</h2>
-            <p className="modal-date">Pledged on {formatDate(selectedPromise.createdAt)}</p>
-            <p className="modal-promise">"{selectedPromise.promise}"</p>
+        <div className="promise-details-modal">
+          <div className="modal-content">
+            <button className="close-button" onClick={closePromiseDetails}>&times;</button>
+            <h2>Promise Details</h2>
+            
+            <div className="detail-item">
+              <strong>Name:</strong>
+              <span>{selectedPromise.name || 'Anonymous'}</span>
+            </div>
+            
+            <div className="detail-item">
+              <strong>Date:</strong>
+              <span>{formatDate(selectedPromise.createdAt)}</span>
+            </div>
+            
+            <div className="detail-item">
+              <strong>Promise:</strong>
+              <span>{selectedPromise.promise}</span>
+            </div>
+            
+            {selectedPromise.reminderConsent !== undefined && (
+              <div className="detail-item">
+                <strong>Reminder Consent:</strong>
+                <div className="reminder-consent">
+                  {selectedPromise.reminderConsent 
+                    ? 'This user has agreed to receive reminders about their promise.' 
+                    : 'This user has opted out of receiving reminders.'}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

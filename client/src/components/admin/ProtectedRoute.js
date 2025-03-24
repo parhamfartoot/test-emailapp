@@ -1,36 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import axios from 'axios';
 import { API_BASE_URL } from '../../config';
 
 const ProtectedRoute = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [redirect, setRedirect] = useState(false);
 
   useEffect(() => {
     const verifyToken = async () => {
+      setIsLoading(true);
+      
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         
         if (!token) {
           setIsAuthenticated(false);
           setIsLoading(false);
-          setRedirect(true);
           return;
         }
         
-        const response = await axios.get(`${API_BASE_URL}/api/admin/verify`, {
+        const response = await fetch(`${API_BASE_URL}/api/admin/verify`, {
+          method: 'GET',
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            'Authorization': `Bearer ${token}`,
+          },
         });
         
-        setIsAuthenticated(true);
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          setIsAuthenticated(true);
+        } else {
+          localStorage.removeItem('token');
+          setIsAuthenticated(false);
+        }
       } catch (error) {
-        localStorage.removeItem('adminToken');
+        console.error('Error verifying token:', error);
+        localStorage.removeItem('token');
         setIsAuthenticated(false);
-        setRedirect(true);
       } finally {
         setIsLoading(false);
       }
@@ -46,10 +53,6 @@ const ProtectedRoute = ({ children }) => {
         <p>Verifying authentication...</p>
       </div>
     );
-  }
-  
-  if (redirect) {
-    return <Navigate to="/admin" replace />;
   }
   
   if (!isAuthenticated) {

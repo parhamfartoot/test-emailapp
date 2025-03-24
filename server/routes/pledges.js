@@ -1,6 +1,58 @@
 const express = require('express');
 const router = express.Router();
 const Pledge = require('../models/Pledge');
+const nodemailer = require('nodemailer');
+
+// Create nodemailer transporter with detailed logging
+let transporter;
+try {
+  transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_APP_PASSWORD
+    }
+  });
+  
+  // Verify transporter configuration
+  transporter.verify(function(error, success) {
+    if (error) {
+      console.error('Email transporter verification failed:', error);
+    }
+  });
+} catch (error) {
+  console.error('Failed to create email transporter:', error);
+}
+
+// Send confirmation email
+const sendConfirmationEmail = async (pledge) => {
+  if (!transporter) {
+    console.error('Email transporter not initialized');
+    return { success: false, error: 'Email service not configured' };
+  }
+  
+  try {
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: pledge.email,
+      subject: 'Thank you for your pledge!',
+      html: `
+        <h2>Thank you for your pledge, ${pledge.name}!</h2>
+        <p>We've received your promise:</p>
+        <blockquote>${pledge.promise}</blockquote>
+        <p>Your commitment helps make our community better.</p>
+        ${pledge.reminderConsent ? '<p>We will send you reminders to help you keep your promise.</p>' : ''}
+        <p>Regards,<br>The Promise Tree Team</p>
+      `
+    };
+    
+    const info = await transporter.sendMail(mailOptions);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error('Failed to send confirmation email:', error);
+    return { success: false, error: error.message };
+  }
+};
 
 /**
  * Get all pledges
@@ -47,12 +99,41 @@ router.get('/:id', async (req, res) => {
  */
 router.post('/', async (req, res) => {
   try {
-    const newPledge = new Pledge(req.body);
+    const { name, email, promise, reminderConsent } = req.body;
+    
+    // Validate required fields
+    if (!name || !email || !promise) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Please provide name, email, and promise' 
+      });
+    }
+    
+    // Create new pledge
+    const newPledge = new Pledge({
+      name,
+      email,
+      promise,
+      reminderConsent: reminderConsent || false
+    });
+    
+    // Save pledge
     const savedPledge = await newPledge.save();
-    res.status(201).json({ success: true, data: savedPledge });
+    
+    // Send confirmation email
+    const emailResult = await sendConfirmationEmail(savedPledge);
+    
+    // Return success with pledge data and email status
+    res.status(201).json({
+      success: true,
+      message: 'Pledge created successfully',
+      data: savedPledge,
+      emailSent: emailResult.success,
+      emailDetails: emailResult
+    });
   } catch (error) {
     console.error('Error creating pledge:', error);
-    res.status(400).json({ 
+    res.status(500).json({ 
       success: false, 
       message: 'Failed to create pledge', 
       error: error.message 

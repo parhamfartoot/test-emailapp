@@ -23,7 +23,7 @@ const AdminDashboard = () => {
   
   // Check if user is authenticated
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
+    const token = localStorage.getItem('token');
     if (!token) {
       navigate('/admin');
       return;
@@ -38,7 +38,7 @@ const AdminDashboard = () => {
           }
         });
       } catch (err) {
-        localStorage.removeItem('adminToken');
+        localStorage.removeItem('token');
         navigate('/admin');
       }
     };
@@ -50,7 +50,7 @@ const AdminDashboard = () => {
   const fetchPledges = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem('token');
       
       if (!token) {
         navigate('/admin');
@@ -63,22 +63,32 @@ const AdminDashboard = () => {
         }
       });
       
-      const fetchedPledges = response.data;
-      
-      // Sort pledges by date (newest first)
-      const sortedPledges = fetchedPledges.sort((a, b) => 
-        new Date(b.createdAt) - new Date(a.createdAt)
-      );
-      
-      setPledges(sortedPledges);
-      setFilteredPledges(sortedPledges);
-      setError(null);
+      // Check if response has the expected structure
+      if (response.data && response.data.success) {
+        // Get the pledges data (response might contain data in response.data.data)
+        const fetchedPledges = response.data.data || [];
+        
+        // Sort pledges by date (newest first)
+        const sortedPledges = fetchedPledges.sort((a, b) => 
+          new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        
+        setPledges(sortedPledges);
+        setFilteredPledges(sortedPledges);
+        setError(null);
+      } else {
+        // Handle unexpected response structure
+        console.error('Unexpected response structure:', response.data);
+        setError('Failed to load pledges: Invalid response format');
+      }
     } catch (err) {
+      console.error('Error fetching pledges:', err);
+      
       if (err.response?.status === 401 || err.response?.status === 403) {
-        localStorage.removeItem('adminToken');
+        localStorage.removeItem('token');
         navigate('/admin');
       } else {
-        setError('Failed to load pledges. Please try again later.');
+        setError(`Failed to load pledges: ${err.message || 'Unknown error'}`);
       }
     } finally {
       setLoading(false);
@@ -96,7 +106,7 @@ const AdminDashboard = () => {
       setDeleteError(null);
       setDeleteSuccess(null);
       
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem('token');
       
       if (!token) {
         navigate('/admin');
@@ -126,7 +136,7 @@ const AdminDashboard = () => {
       }, 3000);
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 403) {
-        localStorage.removeItem('adminToken');
+        localStorage.removeItem('token');
         navigate('/admin');
       } else {
         setDeleteError('Failed to delete pledge. Please try again.');
@@ -138,7 +148,7 @@ const AdminDashboard = () => {
   
   // Handle logout
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
+    localStorage.removeItem('token');
     navigate('/admin');
   };
 

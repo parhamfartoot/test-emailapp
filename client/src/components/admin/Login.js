@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './admin.css';
 import { API_BASE_URL } from '../../config';
@@ -11,49 +10,8 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [apiStatus, setApiStatus] = useState(null);
   
   const navigate = useNavigate();
-  
-  // Test API connection on component mount
-  useEffect(() => {
-    const testApiConnection = async () => {
-      try {
-        // First, try a basic connection test to the root endpoint
-        // This will work even if the /api/test endpoint doesn't exist
-        try {
-          await axios.get(`${API_BASE_URL}`);
-          setApiStatus({
-            connected: true,
-            url: API_BASE_URL,
-            message: 'API connection successful (basic)'
-          });
-        } catch (rootErr) {
-          // If that fails, try the test endpoint (which may not exist in all environments)
-          try {
-            const response = await axios.get(`${API_BASE_URL}/api/test`);
-            setApiStatus({
-              connected: true,
-              url: API_BASE_URL,
-              message: response.data.message,
-              timestamp: response.data.timestamp
-            });
-          } catch (testErr) {
-            throw rootErr; // Re-throw the original error if both tests fail
-          }
-        }
-      } catch (err) {
-        console.error('API connection test failed:', err);
-        setApiStatus({
-          connected: false,
-          url: API_BASE_URL,
-          error: err.message
-        });
-      }
-    };
-    
-    testApiConnection();
-  }, []);
   
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -65,25 +23,34 @@ const Login = () => {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!credentials.username || !credentials.password) {
-      setError('Username and password are required');
-      return;
-    }
+    setLoading(true);
+    setError('');
     
     try {
-      setLoading(true);
-      setError('');
+      // Make login request to admin API
+      const response = await fetch(`${API_BASE_URL}/api/admin/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: credentials.username, password: credentials.password }),
+      });
       
-      const response = await axios.post(`${API_BASE_URL}/api/admin/login`, credentials);
+      const data = await response.json();
       
-      // Save token to localStorage
-      localStorage.setItem('adminToken', response.data.token);
-      
-      // Redirect to admin dashboard
-      navigate('/admin/dashboard');
+      if (response.ok && data.success) {
+        // Store token in localStorage
+        localStorage.setItem('token', data.token);
+        
+        // Redirect to admin dashboard
+        navigate('/admin/dashboard');
+      } else {
+        setError(data.message || 'Login failed. Please check your credentials.');
+      }
     } catch (err) {
-      setError('Login failed. Please check your credentials.');
+      console.error('Login error:', err);
+      setError('Server error. Please try again later.');
+    } finally {
       setLoading(false);
     }
   };
@@ -94,18 +61,6 @@ const Login = () => {
         <h1 className="login-title">Admin Login</h1>
         
         {error && <div className="error-message">{error}</div>}
-        
-        {apiStatus && (
-          <div className={`api-status ${apiStatus.connected ? 'connected' : 'disconnected'}`}>
-            <p>API Status: {apiStatus.connected ? 'Connected' : 'Disconnected'}</p>
-            <p>URL: {apiStatus.url}</p>
-            {apiStatus.connected ? (
-              <p>Message: {apiStatus.message}</p>
-            ) : (
-              <p>Error: {apiStatus.error}</p>
-            )}
-          </div>
-        )}
         
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">

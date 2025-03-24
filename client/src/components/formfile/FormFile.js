@@ -85,42 +85,47 @@ const EmailForm = () => {
     setIsLoading(true);
     setStatus({ message: '', type: '' });
     
-    const emailData = {
-      to: formData.email,
-      subject: 'Your Promise to the Earth',
-      text: `Dear ${formData.name},\n\nThank you for your commitment to a sustainable future. Your promise: "${formData.promise}"\n\nWe'll remind you of this promise in 2029.\n\nThe First Supper Initiative`,
-      // Add pledge data for database storage
+    // Prepare data for the API
+    const pledgeData = {
       name: formData.name,
+      email: formData.email,
       promise: formData.promise,
-      consent: formData.consent
+      reminderConsent: formData.consent
     };
     
     try {
+      // Use the correct API endpoint
       const response = await axios.post(
-        `${API_BASE_URL}/send-email`, 
-        emailData,
+        `${API_BASE_URL}/api/pledges`, 
+        pledgeData,
         {
           headers: {
             'Content-Type': 'application/json',
           },
         }
       );
-      setStatus({
-        message: 'Your promise has been recorded and added to our Digital Time Capsule!',
-        type: 'success'
-      });
-      setFormData({ name: '', email: '', promise: '', consent: false });
       
-      setTimeout(() => {
-        navigate('/promise-tree');
-      }, 1500);
-      
+      if (response.data.success) {
+        setStatus({
+          message: 'Your promise has been recorded and added to our Digital Time Capsule!',
+          type: 'success'
+        });
+        setFormData({ name: '', email: '', promise: '', consent: false });
+        
+        // Navigate to promise tree after successful submission
+        setTimeout(() => {
+          navigate('/promise-tree');
+        }, 1500);
+      } else {
+        throw new Error(response.data.message || 'Failed to send promise');
+      }
     } catch (error) {
-      setIsLoading(false);
       setStatus({
         message: 'Failed to send promise. Please try again later.',
         type: 'error'
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
