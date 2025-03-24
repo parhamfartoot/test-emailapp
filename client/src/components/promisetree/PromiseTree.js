@@ -25,16 +25,37 @@ const PromiseTree = () => {
     return 3;
   };
 
-  // Update window width on resize
+  // Handle mobile browser chrome (address bar) height changes
   useEffect(() => {
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+    
     const handleResize = () => {
+      // Reset viewport height variable on resize
+      vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+      
+      // Update window width for carousel
       setWindowWidth(window.innerWidth);
       // Reset to first slide when resizing to avoid empty slides
       setCurrentSlide(0);
     };
     
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    
+    // Improve iOS scroll behavior for address bar
+    const handleTouchMove = () => {
+      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+    };
+    
+    window.addEventListener('touchmove', handleTouchMove);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+      window.removeEventListener('touchmove', handleTouchMove);
+    };
   }, []);
 
   // Load promises data from the API

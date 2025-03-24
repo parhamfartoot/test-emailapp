@@ -1,8 +1,18 @@
+:root {
+  --vh: 1vh;
+}
+
 /* Main container */
 .promise-tree-container {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: 100vh; /* Fallback */
+  height: calc(var(--vh, 1vh) * 100);
+  height: calc(100vh - env(safe-area-inset-bottom, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -26,11 +36,21 @@
   background-color: rgba(0, 0, 0, 0.5);
   color: #fff;
   width: 100%;
-  height: 100vh;
+  height: 100vh; /* Fallback */
+  height: calc(var(--vh, 1vh) * 100);
+  height: calc(100vh - env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow: hidden;
+}
+
+@supports (-webkit-touch-callout: none) {
+  /* Safari-specific fixes for the 100vh issue */
+  .promise-tree-container,
+  .content-overlay {
+    height: -webkit-fill-available;
+  }
 }
 
 .main-content {
@@ -44,6 +64,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
 /* Page title and description */
@@ -329,6 +350,39 @@
     font-size: 1rem;
     margin-bottom: 1.5rem;
   }
+  
+  /* Minimum touch target size of 44x44px per WCAG guidelines */
+  .carousel-button,
+  .carousel-indicator,
+  .search-input,
+  .close-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  /* Add more space between carousel indicators for easier tapping */
+  .carousel-indicators {
+    gap: 12px;
+  }
+  
+  /* Ensure promise cards have enough space to tap */
+  .promise-card {
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Tap highlight for interactive elements */
+  .carousel-button:active,
+  .carousel-indicator:active,
+  .promise-card:active {
+    opacity: 0.8;
+  }
+  
+  /* Improve search input usability */
+  .search-input {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+    padding: 12px 20px;
+  }
 }
 
 /* Promise card */
@@ -410,12 +464,16 @@
   left: 0;
   width: 100%;
   height: 100%;
+  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   background: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
   padding: 0;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .modal-content {
@@ -758,5 +816,45 @@
   .carousel-content .promise-card {
     width: calc(50% - 15px);
     min-width: 240px;
+  }
+}
+
+/* Fix for Safari bounce effect */
+html, body {
+  position: fixed;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 576px) {
+  .modal-content {
+    width: 90%;
+    max-height: 80vh;
+    max-height: calc(var(--vh, 1vh) * 80);
+    margin: auto;
+    padding: 20px;
+    border-radius: 12px;
+  }
+  
+  /* Make the close button easier to tap */
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 10px;
+    font-size: 28px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 } 
