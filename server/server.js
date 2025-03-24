@@ -19,12 +19,14 @@ app.use(express.json());
 
 // Import routes
 const adminRoutes = require('./routes/admin');
+const pledgesRoutes = require('./routes/pledges');
 // Uncomment these when implemented
 // const userRoutes = require('./routes/users');
 // const emailRoutes = require('./routes/emails');
 
 // Use routes
 app.use('/api/admin', adminRoutes);
+app.use('/api/pledges', pledgesRoutes);
 // Uncomment these when implemented
 // app.use('/api/users', userRoutes);
 // app.use('/api/emails', emailRoutes);
