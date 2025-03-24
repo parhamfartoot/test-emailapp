@@ -19,13 +19,29 @@ const Login = () => {
   useEffect(() => {
     const testApiConnection = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/test`);
-        setApiStatus({
-          connected: true,
-          url: API_BASE_URL,
-          message: response.data.message,
-          timestamp: response.data.timestamp
-        });
+        // First, try a basic connection test to the root endpoint
+        // This will work even if the /api/test endpoint doesn't exist
+        try {
+          await axios.get(`${API_BASE_URL}`);
+          setApiStatus({
+            connected: true,
+            url: API_BASE_URL,
+            message: 'API connection successful (basic)'
+          });
+        } catch (rootErr) {
+          // If that fails, try the test endpoint (which may not exist in all environments)
+          try {
+            const response = await axios.get(`${API_BASE_URL}/api/test`);
+            setApiStatus({
+              connected: true,
+              url: API_BASE_URL,
+              message: response.data.message,
+              timestamp: response.data.timestamp
+            });
+          } catch (testErr) {
+            throw rootErr; // Re-throw the original error if both tests fail
+          }
+        }
       } catch (err) {
         console.error('API connection test failed:', err);
         setApiStatus({
