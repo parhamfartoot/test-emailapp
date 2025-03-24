@@ -7,7 +7,11 @@ const path = require('path'); // Helps with file paths
 const server = spawn('node', ['server.js'], {
   stdio: 'inherit', // Share the same console output as the parent process
   shell: true, // Run in a shell environment
-  cwd: __dirname // Run in the current directory
+  cwd: __dirname, // Run in the current directory
+  env: {
+    ...process.env, // Pass all environment variables
+    PORT: process.env.PORT || 3001 // Use PORT from Render or default to 3001
+  }
 });
 
 // Start the email worker (emailWorker.js) as a separate process
@@ -20,12 +24,12 @@ const emailWorker = spawn('node', ['emailWorker.js'], {
 
 // Handle any errors with the server process
 server.on('error', (error) => {
-  // Handle error silently
+  console.error('Server process error:', error);
 });
 
 // Handle any errors with the email worker process
 emailWorker.on('error', (error) => {
-  // Handle error silently
+  console.error('Email worker process error:', error);
 });
 
 // Handle shutdown when user presses Ctrl+C
