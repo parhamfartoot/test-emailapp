@@ -5,15 +5,27 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const app = express();
 
-// Middleware
-app.use(cors());
+// CORS configuration
+app.use(cors({
+  origin: [
+    'https://email-app-client.onrender.com',
+    'http://localhost:3000' // For local development
+  ],
+  credentials: true
+}));
+
+// JSON parsing middleware
 app.use(express.json());
 
-// Import routes (add your actual routes here)
+// Import routes
+const adminRoutes = require('./routes/admin');
+// Uncomment these when implemented
 // const userRoutes = require('./routes/users');
 // const emailRoutes = require('./routes/emails');
 
 // Use routes
+app.use('/api/admin', adminRoutes);
+// Uncomment these when implemented
 // app.use('/api/users', userRoutes);
 // app.use('/api/emails', emailRoutes);
 
