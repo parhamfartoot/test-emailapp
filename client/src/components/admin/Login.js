@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './admin.css';
 import { API_BASE_URL } from '../../config';
@@ -12,6 +12,34 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   
   const navigate = useNavigate();
+  
+  // Handle mobile browser chrome (address bar) height changes
+  useEffect(() => {
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+    
+    const handleResize = () => {
+      // Reset viewport height variable on resize
+      vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    
+    // Improve iOS scroll behavior for address bar
+    const handleTouchMove = () => {
+      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+    };
+    
+    window.addEventListener('touchmove', handleTouchMove);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+      window.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, []);
   
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -73,6 +101,7 @@ const Login = () => {
               onChange={handleChange}
               placeholder="Enter admin username"
               disabled={loading}
+              autoComplete="username"
             />
           </div>
           
@@ -86,6 +115,7 @@ const Login = () => {
               onChange={handleChange}
               placeholder="Enter admin password"
               disabled={loading}
+              autoComplete="current-password"
             />
           </div>
           

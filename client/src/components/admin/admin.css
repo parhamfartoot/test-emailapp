@@ -1,10 +1,20 @@
+/* Root variables for viewport height */
+:root {
+  --vh: 1vh;
+}
+
 /* Admin Login Page Styles */
 .admin-login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  min-height: calc(var(--vh, 1vh) * 100);
   background: linear-gradient(135deg, #2c3e50, #4ca1af);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 .login-box {
@@ -14,6 +24,7 @@
   padding: 40px;
   width: 100%;
   max-width: 400px;
+  margin: 20px;
 }
 
 .login-title {
@@ -64,6 +75,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s;
+  min-height: 44px;
 }
 
 .login-button:hover {
@@ -96,9 +108,25 @@
 /* Admin Dashboard Styles */
 .admin-dashboard-container {
   position: relative;
-  min-height: 100vh;
   width: 100%;
+  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
+  height: calc(100vh - env(safe-area-inset-bottom, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@supports (-webkit-touch-callout: none) {
+  /* Safari-specific fixes for the 100vh issue */
+  .admin-dashboard-container,
+  .content-overlay {
+    height: -webkit-fill-available;
+  }
 }
 
 .admin-header {
@@ -126,6 +154,8 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .logout-button:hover {
@@ -149,6 +179,8 @@
   cursor: pointer;
   transition: background-color 0.3s;
   margin-top: 20px;
+  min-height: 44px;
+  min-width: 100px;
 }
 
 .delete-button:hover {
@@ -170,7 +202,7 @@
 
 /* Shared styles from PromiseTree component */
 .background-video {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -182,51 +214,73 @@
 .content-overlay {
   position: relative;
   z-index: 1;
-  background: rgba(0, 0, 0, 0.6);
-  min-height: 100vh;
-  padding: 20px;
-  box-sizing: border-box;
-  color: white;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  width: 100%;
+  height: 100vh; /* Fallback */
+  height: calc(var(--vh, 1vh) * 100);
+  height: calc(100vh - env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
 }
 
 .main-content {
+  width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  padding: 2rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+.mobile-scroll-container {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  width: 100%;
+  flex: 1;
 }
 
 .page-description {
   text-align: center;
   font-size: 18px;
-  margin-bottom: 30px;
-  opacity: 0.8;
+  margin-bottom: 25px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .search-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 30px;
+  margin: 0 auto 30px;
+  max-width: 500px;
+  width: 100%;
 }
 
 .search-input {
   width: 100%;
-  max-width: 500px;
   padding: 12px 20px;
-  border-radius: 25px;
-  border: none;
+  border: 1px solid #4ca1af;
+  border-radius: 30px;
   font-size: 16px;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  transition: background-color 0.3s;
+  transition: all 0.3s;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .search-input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: #666;
 }
 
 .search-input:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.3);
+  border-color: #2c3e50;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .loading-container {
@@ -234,15 +288,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 200px;
+  padding: 40px;
+  min-height: 300px;
 }
 
 .spinner {
-  border: 4px solid rgba(255, 255, 255, 0.3);
+  border: 5px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  border-top: 4px solid white;
-  width: 40px;
-  height: 40px;
+  border-top: 5px solid #4ca1af;
+  width: 50px;
+  height: 50px;
   animation: spin 1s linear infinite;
   margin-bottom: 20px;
 }
@@ -253,188 +308,224 @@
 }
 
 .error-container {
+  width: 100%;
+  max-width: 800px;
   text-align: center;
-  background: rgba(220, 53, 69, 0.2);
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 600px;
-  margin: 0 auto;
+  padding: 30px;
+  background-color: rgba(255, 0, 0, 0.2);
+  border-radius: 10px;
+  margin: 20px 0;
 }
 
 .retry-button {
-  background: #dc3545;
+  background-color: rgba(76, 161, 175, 0.8);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   padding: 10px 20px;
   margin-top: 15px;
-  font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+  min-height: 44px;
 }
 
 .retry-button:hover {
-  background: #c82333;
+  background-color: rgba(76, 161, 175, 1);
 }
 
 .pledge-stats {
   text-align: center;
+  padding: 10px 15px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
   margin-bottom: 20px;
-  font-size: 18px;
-  opacity: 0.8;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.carousel-section {
+  width: 100%;
+  padding: 20px 0;
 }
 
 .carousel-container {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
   align-items: center;
-  margin-bottom: 30px;
+  justify-content: center;
   position: relative;
-  max-width: 100%;
+  margin: 20px 0;
+  padding: 0 60px;
+}
+
+.carousel-content-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
 }
 
 .carousel-content {
   display: flex;
-  justify-content: center;
   flex-wrap: nowrap;
   gap: 20px;
   width: 100%;
-  padding: 0 60px;
-  overflow: visible;
+  max-width: 1200px;
+  overflow: hidden;
+  justify-content: center;
+  transition: transform 0.5s ease;
 }
 
 .pledge-card {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 20px;
-  width: calc(33.333% - 20px);
-  min-width: 250px;
-  max-width: 350px;
-  margin-bottom: 0;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-  flex: 1;
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
-  border-top: 3px solid #4CAF50;
+  cursor: pointer;
+  border-top: 5px solid #4ca1af;
+  min-height: 200px;
+  width: 100%;
+}
+
+.mobile-card {
+  margin: 0 auto;
+  min-height: 220px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .pledge-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-  background: #f5f5f5;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+  background-color: #f5f5f5;
 }
 
 .card-header {
-  margin-bottom: 15px;
+  padding: 15px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  padding-bottom: 10px;
+  background-color: rgba(76, 161, 175, 0.1);
 }
 
 .card-header h3 {
-  margin: 0 0 5px 0;
-  color: #2E7D32;
-  font-size: 1.2rem;
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.25rem;
 }
 
 .card-header small {
-  color: #666666;
-  font-size: 0.8rem;
   display: block;
+  color: #666;
+  margin-top: 5px;
+  font-style: italic;
 }
 
 .card-content {
-  flex: 1;
-  overflow: hidden;
-  margin-bottom: 15px;
+  padding: 15px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .card-content p {
   margin: 0;
-  color: #333333;
-  line-height: 1.6;
-  height: 80px;
+  line-height: 1.5;
+  color: #333;
   overflow: hidden;
-  text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
 }
 
 .card-footer {
+  padding: 10px 15px;
   text-align: right;
-  margin-top: auto;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: rgba(76, 161, 175, 0.05);
 }
 
 .read-more {
-  color: #4CAF50;
+  color: #2c3e50;
+  font-weight: 600;
   font-size: 0.9rem;
-  cursor: pointer;
 }
 
 .carousel-button {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
+  background-color: rgba(76, 161, 175, 0.8);
   color: white;
-  font-size: 24px;
+  border: none;
+  border-radius: 50%;
   width: 50px;
   height: 50px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 24px;
   cursor: pointer;
-  transition: background-color 0.3s;
-  position: absolute;
+  transition: all 0.3s ease;
   z-index: 10;
+  flex-shrink: 0;
+  align-self: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .prev-button {
-  left: 0;
+  margin-right: 15px;
 }
 
 .next-button {
-  right: 0;
+  margin-left: 15px;
 }
 
-.carousel-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+.carousel-button:hover:not(:disabled) {
+  background-color: rgba(76, 161, 175, 1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
 
 .carousel-button:disabled {
-  opacity: 0.5;
+  background-color: rgba(76, 161, 175, 0.3);
   cursor: not-allowed;
 }
 
 .carousel-indicators {
   display: flex;
   justify-content: center;
-  gap: 10px;
   margin-top: 20px;
+  gap: 8px;
 }
 
 .carousel-indicator {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  border: none;
+  background-color: rgba(76, 161, 175, 0.3);
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  border: none;
   padding: 0;
 }
 
 .carousel-indicator.active {
-  background: white;
+  background-color: #4ca1af;
+  transform: scale(1.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
 .no-pledges {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 30px;
+  border-radius: 12px;
   text-align: center;
-  padding: 50px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  margin-top: 20px;
+  max-width: 600px;
+  margin: 40px auto;
+  color: #333;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .pledge-details-modal {
@@ -443,11 +534,16 @@
   left: 0;
   width: 100%;
   height: 100%;
+  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   background: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  padding: 0;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .modal-content {
@@ -460,7 +556,16 @@
   color: #2c3e50;
   box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
   max-height: 90vh;
+  max-height: calc(var(--vh, 1vh) * 90);
   overflow-y: auto;
+}
+
+.modal-content h2 {
+  margin: 0 0 20px 0;
+  color: #2c3e50;
+  font-size: 1.8rem;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
 }
 
 .close-button {
@@ -473,6 +578,11 @@
   cursor: pointer;
   color: #999;
   transition: color 0.3s;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .close-button:hover {
@@ -483,6 +593,8 @@
   margin-bottom: 15px;
   padding-bottom: 15px;
   border-bottom: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
 }
 
 .detail-item:last-child {
@@ -490,158 +602,307 @@
 }
 
 .detail-item strong {
-  display: inline-block;
-  min-width: 80px;
+  display: block;
   color: #4ca1af;
+  margin-bottom: 5px;
+  font-size: 1rem;
+}
+
+.detail-item span {
+  color: #333;
+  line-height: 1.6;
 }
 
 .reminder-consent {
   background: rgba(76, 161, 175, 0.1);
   padding: 10px;
   border-radius: 4px;
+  border-left: 3px solid #4ca1af;
+  margin-top: 5px;
 }
 
-/* Add these styles at the end of your existing CSS file */
-
-.api-status {
+/* Mobile carousel controls */
+.mobile-carousel-controls {
+  display: none;
+  justify-content: center;
+  gap: 20px;
   margin: 15px 0;
-  padding: 10px;
-  border-radius: 4px;
-  font-size: 14px;
 }
 
-.api-status p {
-  margin: 5px 0;
-}
-
-.api-status.connected {
-  background-color: #e8f5e9;
-  border: 1px solid #66bb6a;
-  color: #2e7d32;
-}
-
-.api-status.disconnected {
-  background-color: #ffebee;
-  border: 1px solid #ef5350;
-  color: #c62828;
-}
-
-/* Mobile Responsive Design */
-@media (max-width: 768px) {
-  .admin-dashboard-container {
-    padding: 10px;
+/* Desktop styles */
+@media (min-width: 577px) {
+  /* Fix the width of cards so they don't stretch */
+  .carousel-content .pledge-card {
+    flex: 0 0 auto;
+    width: calc(33.333% - 20px);
+    max-width: 350px;
+    min-width: 250px;
   }
   
-  .admin-header {
-    flex-direction: column;
-    align-items: center;
-    padding: 15px;
+  /* Two cards per row on tablets */
+  @media (max-width: 992px) {
+    .carousel-content .pledge-card {
+      width: calc(50% - 15px);
+      min-width: 240px;
+    }
   }
   
-  .admin-title {
-    font-size: 1.8rem;
-    margin-bottom: 15px;
-  }
-  
-  .logout-button {
-    margin-top: 10px;
-  }
-  
-  .admin-controls {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .search-input {
-    width: 100%;
-    max-width: none;
-  }
-  
-  .carousel-container {
-    padding: 0 40px;
-  }
-  
-  .modal-content {
-    padding: 20px;
-    max-width: 90%;
-  }
-}
-
-@media (max-width: 480px) {
-  .admin-title {
-    font-size: 1.5rem;
-  }
-  
-  .admin-header {
-    padding: 10px;
-  }
-  
-  .admin-actions {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .search-input {
-    padding: 8px 15px;
-    font-size: 0.9rem;
-  }
-  
-  .pledge-card {
-    padding: 12px;
-  }
-  
-  .card-header h3 {
-    font-size: 0.9rem;
-  }
-  
-  .card-content p {
-    font-size: 0.85rem;
-  }
-  
-  .carousel-container {
-    padding: 0 30px;
-  }
-  
+  /* Make the carousel buttons stick to the sides */
   .carousel-button {
-    width: 30px;
-    height: 30px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
   }
   
-  .modal-content {
-    padding: 15px;
+  .prev-button {
+    left: 10px;
+    margin-right: 0;
   }
   
-  .detail-item {
-    font-size: 0.9rem;
-  }
-  
-  .login-box {
-    width: 90%;
-    padding: 20px;
+  .next-button {
+    right: 10px;
+    margin-left: 0;
   }
 }
 
-/* Special iPhone fixes */
-@media screen and (device-width: 375px) and (device-height: 812px), 
-       screen and (device-width: 414px) and (device-height: 896px) {
-  .background-video {
-    pointer-events: none;
-    touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-  
-  .modal-content {
-    max-height: 80vh;
-  }
-  
+/* Mobile styles */
+@media (max-width: 576px) {
+  /* Structure */
   .admin-dashboard-container {
-    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .content-overlay {
     overflow: hidden;
   }
   
   .main-content {
-    max-height: 85vh;
-    overflow-y: auto;
+    padding: 1rem;
+    max-height: none;
   }
+  
+  .admin-header {
+    padding: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .admin-title {
+    font-size: 1.8rem;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .logout-button {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .admin-controls {
+    margin-bottom: 15px;
+  }
+  
+  .page-description {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Carousel structure */
+  .carousel-container {
+    padding: 0;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .carousel-section {
+    padding: 10px 0;
+    width: 100%;
+  }
+  
+  .carousel-content {
+    margin: 0 auto;
+    gap: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+  }
+  
+  /* Show mobile navigation controls */
+  .mobile-carousel-controls {
+    display: flex;
+    margin-top: 25px;
+    margin-bottom: 10px;
+  }
+  
+  .mobile-carousel-controls .carousel-button {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+  
+  /* Card elements */
+  .card-header {
+    padding: 15px 20px;
+  }
+  
+  .card-content {
+    padding: 15px 20px;
+  }
+  
+  .card-footer {
+    padding: 12px 20px;
+  }
+  
+  .card-header h3 {
+    font-size: 1.2rem;
+  }
+  
+  .card-content p {
+    font-size: 1rem;
+    line-height: 1.5;
+    -webkit-line-clamp: 3;
+  }
+  
+  .read-more {
+    font-size: 1rem;
+  }
+  
+  /* Modal */
+  .modal-content {
+    width: 90%;
+    max-height: 80vh;
+    max-height: calc(var(--vh, 1vh) * 80);
+    margin: auto;
+    padding: 20px;
+    border-radius: 12px;
+  }
+  
+  .modal-content h2 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+  }
+  
+  .detail-item {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+  }
+  
+  .detail-item strong {
+    font-size: 0.95rem;
+  }
+  
+  .detail-item span {
+    font-size: 0.9rem;
+  }
+  
+  /* Make the close button easier to tap */
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 10px;
+    font-size: 28px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Login screen */
+  .login-box {
+    padding: 25px;
+    margin: 15px;
+  }
+  
+  .login-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    font-size: 0.9rem;
+  }
+  
+  .form-group input {
+    padding: 10px;
+    font-size: 1rem;
+  }
+  
+  .login-button {
+    padding: 10px;
+  }
+  
+  /* Empty state */
+  .no-pledges {
+    padding: 20px;
+    margin: 20px 15px;
+  }
+  
+  /* Status messages */
+  .error-message, 
+  .success-message {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+  
+  /* Button aesthetics */
+  .delete-button {
+    font-size: 0.95rem;
+    padding: 8px 16px;
+  }
+  
+  /* Special iPhone fixes */
+  @supports (-webkit-touch-callout: none) {
+    /* Ensure content doesn't get cut off by the notch or home indicator */
+    .modal-content {
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      padding-left: max(20px, env(safe-area-inset-left));
+      padding-right: max(20px, env(safe-area-inset-right));
+    }
+  }
+  
+  /* Prevent iOS zooming on input focus */
+  .search-input {
+    font-size: 16px;
+    padding: 12px 20px;
+  }
+  
+  /* Minimum touch target size of 44x44px per WCAG guidelines */
+  .carousel-button,
+  .carousel-indicator,
+  .search-input,
+  .close-button,
+  .login-button,
+  .delete-button,
+  .retry-button,
+  .logout-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  /* Tap highlight for interactive elements */
+  .carousel-button:active,
+  .carousel-indicator:active,
+  .pledge-card:active {
+    opacity: 0.8;
+  }
+}
+
+/* Fix for Safari bounce effect */
+html, body {
+  position: fixed;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
 } 

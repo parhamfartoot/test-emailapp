@@ -17,9 +17,49 @@ const AdminDashboard = () => {
   const [deleteError, setDeleteError] = useState(null);
   const [deleteSuccess, setDeleteSuccess] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const itemsPerSlide = 3; // Number of pledges to show per slide
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
   const navigate = useNavigate();
+  
+  // Responsive carousel settings
+  const getItemsPerSlide = () => {
+    if (windowWidth <= 576) return 1;
+    if (windowWidth <= 992) return 2;
+    return 3;
+  };
+  
+  // Handle mobile browser chrome (address bar) height changes
+  useEffect(() => {
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+    
+    const handleResize = () => {
+      // Reset viewport height variable on resize
+      vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+      
+      // Update window width for carousel
+      setWindowWidth(window.innerWidth);
+      // Reset to first slide when resizing to avoid empty slides
+      setCurrentSlide(0);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    
+    // Improve iOS scroll behavior for address bar
+    const handleTouchMove = () => {
+      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+    };
+    
+    window.addEventListener('touchmove', handleTouchMove);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+      window.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, []);
   
   // Check if user is authenticated
   useEffect(() => {
@@ -186,6 +226,7 @@ const AdminDashboard = () => {
   }, [searchQuery, pledges]);
   
   // Calculate total number of slides
+  const itemsPerSlide = getItemsPerSlide();
   const totalSlides = Math.ceil(filteredPledges.length / itemsPerSlide);
   
   // Navigate to previous slide
@@ -227,6 +268,8 @@ const AdminDashboard = () => {
 
   // Render the carousel content
   const renderCarousel = () => {
+    const isMobile = windowWidth <= 576;
+    
     // Check if there are no pledges at all
     if (pledges.length === 0) {
       return (
@@ -249,52 +292,98 @@ const AdminDashboard = () => {
     const currentPledges = getCurrentPledges();
     
     return (
-      <>
-        <div className="carousel-container">
-          <button 
-            className="carousel-button prev-button" 
-            onClick={prevSlide}
-            disabled={totalSlides <= 1}
-            aria-label="Previous slide"
-          >
-            &laquo;
-          </button>
-          
-          <div className="carousel-content">
-            {currentPledges.map(pledge => (
-              <div 
-                key={pledge._id} 
-                className="pledge-card" 
-                onClick={() => handlePledgeClick(pledge)}
-              >
-                <div className="card-header">
-                  <h3>{pledge.name || 'Anonymous'}</h3>
-                  <small>{formatDate(pledge.createdAt)}</small>
+      <div className="carousel-container">
+        {!isMobile ? (
+          // Desktop view with content wrapper
+          <div className="carousel-content-wrapper">
+            <button 
+              className="carousel-button prev-button" 
+              onClick={prevSlide}
+              disabled={totalSlides <= 1}
+              aria-label="Previous slide"
+            >
+              &laquo;
+            </button>
+            
+            <div className="carousel-content">
+              {currentPledges.map(pledge => (
+                <div 
+                  key={pledge._id} 
+                  className="pledge-card" 
+                  onClick={() => handlePledgeClick(pledge)}
+                >
+                  <div className="card-header">
+                    <h3>{pledge.name || 'Anonymous'}</h3>
+                    <small>{formatDate(pledge.createdAt)}</small>
+                  </div>
+                  <div className="card-content">
+                    <p>{pledge.promise || 'No details available'}</p>
+                  </div>
+                  <div className="card-footer">
+                    <span className="read-more">View Details</span>
+                  </div>
                 </div>
-                <div className="card-content">
-                  <p>{pledge.promise || 'No details available'}</p>
-                </div>
-                <div className="card-footer">
-                  <span className="read-more">Read more</span>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            
+            <button 
+              className="carousel-button next-button" 
+              onClick={nextSlide}
+              disabled={totalSlides <= 1}
+              aria-label="Next slide"
+            >
+              &raquo;
+            </button>
           </div>
-          
-          <button 
-            className="carousel-button next-button" 
-            onClick={nextSlide}
-            disabled={totalSlides <= 1}
-            aria-label="Next slide"
-          >
-            &raquo;
-          </button>
-        </div>
+        ) : (
+          // Mobile view with separate controls
+          <>
+            <div className="carousel-content">
+              {currentPledges.map(pledge => (
+                <div 
+                  key={pledge._id} 
+                  className="pledge-card mobile-card" 
+                  onClick={() => handlePledgeClick(pledge)}
+                >
+                  <div className="card-header">
+                    <h3>{pledge.name || 'Anonymous'}</h3>
+                    <small>{formatDate(pledge.createdAt)}</small>
+                  </div>
+                  <div className="card-content">
+                    <p>{pledge.promise || 'No details available'}</p>
+                  </div>
+                  <div className="card-footer">
+                    <span className="read-more">View Details</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mobile-carousel-controls">
+              <button 
+                className="carousel-button prev-button" 
+                onClick={prevSlide} 
+                disabled={totalSlides <= 1}
+                aria-label="Previous slide"
+              >
+                &laquo;
+              </button>
+              <button 
+                className="carousel-button next-button" 
+                onClick={nextSlide} 
+                disabled={totalSlides <= 1}
+                aria-label="Next slide"
+              >
+                &raquo;
+              </button>
+            </div>
+          </>
+        )}
         
-        {totalSlides > 1 && (
+        {!isMobile && totalSlides > 1 && (
           <div className="carousel-indicators">
             {Array.from({ length: totalSlides }).map((_, index) => (
-              <button
+              <div
                 key={index}
                 className={`carousel-indicator ${currentSlide === index ? 'active' : ''}`}
                 onClick={() => setCurrentSlide(index)}
@@ -303,7 +392,7 @@ const AdminDashboard = () => {
             ))}
           </div>
         )}
-      </>
+      </div>
     );
   };
 
@@ -324,12 +413,12 @@ const AdminDashboard = () => {
       </video>
       
       <div className="content-overlay">
-        <div className="admin-header">
-          <h1 className="admin-title">Admin Dashboard</h1>
-          <button onClick={handleLogout} className="logout-button">Logout</button>
-        </div>
-        
-        <div className="main-content">
+        <div className="main-content mobile-scroll-container">
+          <div className="admin-header">
+            <h1 className="admin-title">Admin Dashboard</h1>
+            <button onClick={handleLogout} className="logout-button">Logout</button>
+          </div>
+          
           <div className="admin-controls">
             <p className="page-description">
               Manage pledges by searching, viewing details, and deleting as needed.
@@ -375,7 +464,9 @@ const AdminDashboard = () => {
                 <p>Showing {filteredPledges.length} {filteredPledges.length === 1 ? 'pledge' : 'pledges'}</p>
               </div>
               
-              {renderCarousel()}
+              <div className="carousel-section">
+                {renderCarousel()}
+              </div>
             </>
           )}
         </div>
@@ -386,22 +477,24 @@ const AdminDashboard = () => {
               <button className="close-button" onClick={closePledgeDetails}>&times;</button>
               <h2>Pledge Details</h2>
               <div className="detail-item">
-                <strong>Name:</strong> {selectedPledge.name || 'Unknown'}
+                <strong>Name:</strong> <span>{selectedPledge.name || 'Unknown'}</span>
               </div>
               <div className="detail-item">
-                <strong>Pledge:</strong> {selectedPledge.promise || 'No pledge details available'}
+                <strong>Pledge:</strong> <span>{selectedPledge.promise || 'No pledge details available'}</span>
               </div>
               <div className="detail-item">
-                <strong>Date:</strong> {selectedPledge.createdAt ? formatDate(selectedPledge.createdAt) : 'Unknown date'}
+                <strong>Date:</strong> <span>{selectedPledge.createdAt ? formatDate(selectedPledge.createdAt) : 'Unknown date'}</span>
               </div>
               {selectedPledge.email && (
                 <div className="detail-item">
-                  <strong>Email:</strong> {selectedPledge.email}
+                  <strong>Email:</strong> <span>{selectedPledge.email}</span>
                 </div>
               )}
               {selectedPledge.reminderConsent !== undefined && (
-                <div className="detail-item reminder-consent">
-                  <strong>Consent:</strong> {selectedPledge.reminderConsent ? 'Has agreed to receive reminders' : 'Has not agreed to receive reminders'}
+                <div className="detail-item">
+                  <strong>Consent:</strong> <div className="reminder-consent">
+                    {selectedPledge.reminderConsent ? 'Has agreed to receive reminders' : 'Has not agreed to receive reminders'}
+                  </div>
                 </div>
               )}
               
