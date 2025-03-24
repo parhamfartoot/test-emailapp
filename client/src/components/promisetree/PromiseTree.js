@@ -215,7 +215,16 @@ const PromiseTree = () => {
 
   return (
     <div className="promise-tree-container">
-      <video className="background-video" autoPlay loop muted>
+      <video 
+        autoPlay 
+        muted 
+        loop 
+        className="background-video" 
+        playsInline 
+        disablePictureInPicture 
+        controlsList="nodownload nofullscreen noremoteplayback" 
+        style={{ pointerEvents: 'none' }}
+      >
         <source src={backgroundVideo} type="video/mp4" />
         Your browser does not support the video tag.
       </video>

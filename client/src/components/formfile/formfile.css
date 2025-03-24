@@ -207,18 +207,62 @@
 
 /* For mobile phones */
 @media (max-width: 480px) {
+  .email-form-container {
+    padding: 15px;
+    width: 90%;
+    margin: 5vh auto;
+    max-height: 85vh;
+  }
+  
   .form-prompt {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+  }
+  
+  .form-group {
+    margin-bottom: 12px;
+  }
+  
+  .form-group label {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
   }
   
   .form-group input[type="text"],
   .form-group input[type="email"],
   .form-group textarea {
     padding: 10px;
+    font-size: 0.9rem;
+  }
+  
+  .checkbox-group label {
+    font-size: 0.9rem;
   }
   
   .submit-btn {
     padding: 12px;
+    width: 100%;
+    font-size: 0.9rem;
+  }
+  
+  .privacy-notice {
+    font-size: 0.7rem;
+    padding: 8px;
+    margin-top: 10px;
+  }
+}
+
+/* Special iPhone fixes */
+@media screen and (device-width: 375px) and (device-height: 812px), 
+       screen and (device-width: 414px) and (device-height: 896px) {
+  .email-form-container {
+    max-height: 80vh;
+    padding: 15px;
+    margin: 10vh auto;
+  }
+  
+  body {
+    overflow: hidden;
   }
 }
 

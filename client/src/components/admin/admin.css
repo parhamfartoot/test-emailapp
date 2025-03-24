@@ -524,4 +524,124 @@
   background-color: #ffebee;
   border: 1px solid #ef5350;
   color: #c62828;
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+  .admin-dashboard-container {
+    padding: 10px;
+  }
+  
+  .admin-header {
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+  }
+  
+  .admin-title {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+  }
+  
+  .logout-button {
+    margin-top: 10px;
+  }
+  
+  .admin-controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .search-input {
+    width: 100%;
+    max-width: none;
+  }
+  
+  .carousel-container {
+    padding: 0 40px;
+  }
+  
+  .modal-content {
+    padding: 20px;
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-title {
+    font-size: 1.5rem;
+  }
+  
+  .admin-header {
+    padding: 10px;
+  }
+  
+  .admin-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .search-input {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+  }
+  
+  .pledge-card {
+    padding: 12px;
+  }
+  
+  .card-header h3 {
+    font-size: 0.9rem;
+  }
+  
+  .card-content p {
+    font-size: 0.85rem;
+  }
+  
+  .carousel-container {
+    padding: 0 30px;
+  }
+  
+  .carousel-button {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .modal-content {
+    padding: 15px;
+  }
+  
+  .detail-item {
+    font-size: 0.9rem;
+  }
+  
+  .login-box {
+    width: 90%;
+    padding: 20px;
+  }
+}
+
+/* Special iPhone fixes */
+@media screen and (device-width: 375px) and (device-height: 812px), 
+       screen and (device-width: 414px) and (device-height: 896px) {
+  .background-video {
+    pointer-events: none;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  
+  .modal-content {
+    max-height: 80vh;
+  }
+  
+  .admin-dashboard-container {
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .main-content {
+    max-height: 85vh;
+    overflow-y: auto;
+  }
 } 

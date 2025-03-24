@@ -37,6 +37,10 @@ body {
   height: 100vh;
   z-index: -2;
   object-fit: cover;
+  pointer-events: none; /* Prevent all mouse interactions */
+  touch-action: none; /* Prevent touch interactions */
+  user-select: none; /* Prevent selection */
+  -webkit-user-select: none;
 }
 
 .video-overlay {
@@ -284,42 +288,109 @@ body {
   .home-content {
     padding: 20px;
     max-width: 90%;
+    max-height: 80vh;
+    margin: 10vh auto;
   }
   
   .handwritten-title {
-    font-size: 2.8rem !important;
+    font-size: 2.5rem !important;
+    margin-top: 0;
   }
   
   .subtitle {
     font-size: 1.1rem !important;
+    margin-bottom: 20px !important;
   }
   
   .earth-promise-prompt,
-  .earth-examples {
+  .earth-examples,
+  .app-description {
     padding: 15px 20px;
+    margin-bottom: 20px;
+  }
+  
+  .home-container p {
+    font-size: 1rem;
+    margin-bottom: 20px;
   }
 }
 
 @media (max-width: 480px) {
   .home-content {
     padding: 15px;
+    margin: 5vh auto;
+    max-height: 85vh;
+    width: 90%;
+    border-radius: 10px;
   }
   
   .handwritten-title {
-    font-size: 2.2rem !important;
+    font-size: 2rem !important;
+    margin-top: 5px;
+    margin-bottom: 5px !important;
   }
   
   .subtitle {
-    font-size: 1rem !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 15px !important;
   }
   
   .earth-promise-prompt p:first-child {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+  }
+  
+  .earth-promise-prompt p:last-child {
+    font-size: 0.9rem;
   }
   
   .action-buttons {
     flex-direction: column;
     gap: 10px;
+    margin: 20px 0;
+  }
+  
+  .btn-primary, .btn-secondary {
+    padding: 10px 20px;
+    width: 100%;
+    text-align: center;
+    font-size: 0.9rem;
+  }
+  
+  .app-description p,
+  .earth-examples li {
+    font-size: 0.9rem;
+  }
+  
+  .privacy-notice {
+    font-size: 0.7rem;
+  }
+  
+  .scroll-down {
+    bottom: 10px;
+  }
+  
+  .scroll-up {
+    top: 70px;
+  }
+}
+
+/* Special iPhone fixes */
+@media screen and (device-width: 375px) and (device-height: 812px), 
+       screen and (device-width: 414px) and (device-height: 896px) {
+  .home-content {
+    max-height: 80vh;
+    padding: 15px;
+    margin: 10vh auto;
+  }
+  
+  body {
+    overflow: hidden;
+  }
+  
+  .scroll-indicator {
+    width: 36px;
+    height: 36px;
   }
 }
 

@@ -50,7 +50,16 @@ function AppHome() {
 
   return (
     <div className="home-container earth-theme" ref={containerRef}>
-      <video autoPlay muted loop className="video-background">
+      <video 
+        autoPlay 
+        muted 
+        loop 
+        className="video-background" 
+        playsInline 
+        disablePictureInPicture 
+        controlsList="nodownload nofullscreen noremoteplayback" 
+        style={{ pointerEvents: 'none' }}
+      >
         <source src={backgroundVideo} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
