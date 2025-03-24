@@ -293,7 +293,7 @@ const EmailForm = () => {
           </div>
           
           <div className={`form-group ${formErrors.email ? 'input-error' : ''}`}>
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">Email Address *</label>
             <input
               type="email"
               id="email"
