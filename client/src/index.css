@@ -1,4 +1,5 @@
 /* Global CSS Reset and Mobile-First Styles */
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
 
 /* Box sizing for all elements */
 *, *::before, *::after {
@@ -17,6 +18,7 @@ figure, figcaption, footer, header, menu, nav, section {
 html {
   -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape */
   text-size-adjust: 100%;
+  font-size: 16px;
 }
 
 body {
@@ -29,6 +31,37 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: Cambria, 'EB Garamond', Georgia, 'Times New Roman', Times, serif;
+  color: #333;
+}
+
+/* Typography styles */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'EB Garamond', Cambria, Georgia, 'Times New Roman', Times, serif;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 0.5em;
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.75rem;
+}
+
+h4 {
+  font-size: 1.5rem;
+}
+
+p {
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
 }
 
 /* Prevent horizontal overflow */
@@ -50,6 +83,7 @@ img, video, svg, canvas, picture {
 input, button, textarea, select {
   font: inherit;
   max-width: 100%;
+  font-family: Cambria, 'EB Garamond', Georgia, 'Times New Roman', Times, serif;
 }
 
 /* Prevent text overflow */
@@ -66,6 +100,19 @@ p, h1, h2, h3, h4, h5, h6 {
   body {
     overflow-x: hidden;
     position: relative;
+    font-size: 15px;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.75rem;
+  }
+  
+  h3 {
+    font-size: 1.5rem;
   }
   
   /* Fix for iOS viewport height issues */

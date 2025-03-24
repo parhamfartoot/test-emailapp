@@ -141,10 +141,10 @@ function AppHome() {
       
       <div className="home-content mobile-scroll-container" ref={contentRef}>
         <h1 className="handwritten-title">A Promise to the Earth</h1>
-        <p className="subtitle">The First Supper - A Digital Time Capsule</p>
+        <p className="subtitle">The Students' First Supper - A Digital Time Capsule</p>
         
         <div className="earth-promise-prompt">
-          <p>"What is your promise to the Earth for 2050?"</p>
+          <p>What is your promise to the Earth for 2050?</p>
           <p>The First Supper represents the inaugural meal of our aspirational future—a world where 
              food systems are sustainable, just, and equitable. What habit, action, or initiative will you 
              commit to today to make that future a reality?</p>
