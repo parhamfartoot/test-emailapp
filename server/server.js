@@ -36,6 +36,16 @@ app.get('/', (req, res) => {
   res.send('Email scheduler API is running');
 });
 
+// Test API endpoint for verifying connectivity
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'API connection successful',
+    timestamp: new Date(),
+    env: process.env.NODE_ENV
+  });
+});
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))

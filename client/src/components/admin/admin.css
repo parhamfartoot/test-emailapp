@@ -487,4 +487,29 @@
   background: rgba(76, 161, 175, 0.1);
   padding: 10px;
   border-radius: 4px;
+}
+
+/* Add these styles at the end of your existing CSS file */
+
+.api-status {
+  margin: 15px 0;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.api-status p {
+  margin: 5px 0;
+}
+
+.api-status.connected {
+  background-color: #e8f5e9;
+  border: 1px solid #66bb6a;
+  color: #2e7d32;
+}
+
+.api-status.disconnected {
+  background-color: #ffebee;
+  border: 1px solid #ef5350;
+  color: #c62828;
 } 

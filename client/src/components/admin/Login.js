@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './admin.css';
@@ -11,8 +11,33 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [apiStatus, setApiStatus] = useState(null);
   
   const navigate = useNavigate();
+  
+  // Test API connection on component mount
+  useEffect(() => {
+    const testApiConnection = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/test`);
+        setApiStatus({
+          connected: true,
+          url: API_BASE_URL,
+          message: response.data.message,
+          timestamp: response.data.timestamp
+        });
+      } catch (err) {
+        console.error('API connection test failed:', err);
+        setApiStatus({
+          connected: false,
+          url: API_BASE_URL,
+          error: err.message
+        });
+      }
+    };
+    
+    testApiConnection();
+  }, []);
   
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,6 +78,18 @@ const Login = () => {
         <h1 className="login-title">Admin Login</h1>
         
         {error && <div className="error-message">{error}</div>}
+        
+        {apiStatus && (
+          <div className={`api-status ${apiStatus.connected ? 'connected' : 'disconnected'}`}>
+            <p>API Status: {apiStatus.connected ? 'Connected' : 'Disconnected'}</p>
+            <p>URL: {apiStatus.url}</p>
+            {apiStatus.connected ? (
+              <p>Message: {apiStatus.message}</p>
+            ) : (
+              <p>Error: {apiStatus.error}</p>
+            )}
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
